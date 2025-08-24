@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import Header from './components/Header';
 import TaskSelection from './components/TaskSelection';
 import EssayEditor from './components/EssayEditor';
