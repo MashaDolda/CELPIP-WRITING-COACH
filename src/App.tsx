@@ -35,8 +35,15 @@ function App() {
   };
 
   const generateAIFeedback = async (essay: EssayData): Promise<FeedbackData> => {
-    const { openaiService } = await import('./services/openai');
-    return await openaiService.evaluateEssay(essay);
+    const response = await fetch(`/api/evaluate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ essay }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to get AI feedback');
+    }
+    return await response.json();
   };
 
   return (
