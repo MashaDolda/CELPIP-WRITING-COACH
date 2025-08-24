@@ -7,7 +7,6 @@ import FeedbackDisplay from './components/FeedbackDisplay';
 import { TaskType, EssayData, FeedbackData } from './types';
 
 function App() {
-  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState<'selection' | 'writing' | 'feedback'>('selection');
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
   const [essayData, setEssayData] = useState<EssayData | null>(null);

@@ -1,4 +1,4 @@
-import { EssayData, FeedbackData, FeedbackScores } from '../types';
+import { EssayData, FeedbackData } from '../types';
 
 interface OpenAIResponse {
   choices: Array<{
