@@ -34,7 +34,7 @@ function App() {
   };
 
   const generateAIFeedback = async (essay: EssayData): Promise<FeedbackData> => {
-    const response = await fetch(`/.netlify/functions/evaluate`, {
+    const response = await fetch(`/api/evaluate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ essay }),
