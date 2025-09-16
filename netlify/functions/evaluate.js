@@ -77,19 +77,34 @@ SPECIAL CONSIDERATIONS:
 
 Provide your response in this EXACT JSON format:
 {
-  "scores": {
-    "content": [score 0-12],
-    "vocabulary": [score 0-12],
-    "readability": [score 0-12],
-    "taskFulfillment": [score 0-12]
+  "overallCLB": [CLB level 1-12 as whole number],
+  "criteriaAnalysis": {
+    "content": {
+      "celpipScore": [score 0-12],
+      "clbLevel": [CLB level 1-12 as whole number],
+      "analysis": "Detailed analysis of content and coherence performance explaining the CLB level",
+      "improvementToNextLevel": "Specific steps to reach next CLB level"
+    },
+    "vocabulary": {
+      "celpipScore": [score 0-12],
+      "clbLevel": [CLB level 1-12 as whole number],
+      "analysis": "Detailed analysis of vocabulary usage explaining the CLB level",
+      "improvementToNextLevel": "Specific steps to reach next CLB level"
+    },
+    "readability": {
+      "celpipScore": [score 0-12],
+      "clbLevel": [CLB level 1-12 as whole number],
+      "analysis": "Detailed analysis of grammar and readability explaining the CLB level",
+      "improvementToNextLevel": "Specific steps to reach next CLB level"
+    },
+    "taskFulfillment": {
+      "celpipScore": [score 0-12],
+      "clbLevel": [CLB level 1-12 as whole number],
+      "analysis": "Detailed analysis of task fulfillment explaining the CLB level",
+      "improvementToNextLevel": "Specific steps to reach next CLB level"
+    }
   },
-  "overallScore": [average of all scores],
-  "recommendations": [
-    "Specific, actionable recommendation 1",
-    "Specific, actionable recommendation 2",
-    "Specific, actionable recommendation 3"
-  ],
-  "corrections": [
+  "keyCorrections": [
     {
       "original": "exact phrase from essay",
       "corrected": "improved version",
@@ -101,7 +116,27 @@ Provide your response in this EXACT JSON format:
     const body = {
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'You are an expert CELPIP examiner. Be accurate and consistent with official scoring.' },
+        { 
+          role: 'system', 
+          content: `You are a certified CELPIP writing examiner with extensive experience in CLB (Canadian Language Benchmark) assessment. You evaluate essays using the official CELPIP-CLB correlation guidelines.
+
+IMPORTANT: Base all evaluations on authentic CELPIP standards and provide CLB scores that directly correspond to CELPIP performance levels.
+
+CLB-CELPIP CORRELATION:
+- CLB 10-12: CELPIP 10-12 (Advanced/Superior)
+- CLB 8-9: CELPIP 7-9 (Advanced) 
+- CLB 6-7: CELPIP 5-6 (Intermediate)
+- CLB 4-5: CELPIP 3-4 (Basic)
+- CLB 1-3: CELPIP 0-2 (Below Basic)
+
+EVALUATION APPROACH:
+1. Assess each criterion using CELPIP 0-12 scale
+2. Convert to corresponding CLB level (whole numbers only)
+3. Provide detailed analysis explaining the CLB assignment
+4. Give specific improvement strategies for reaching next CLB level
+
+Use official CELPIP descriptors and maintain consistency with established benchmarks.` 
+        },
         { role: 'user', content: prompt }
       ],
       temperature: 0.2,

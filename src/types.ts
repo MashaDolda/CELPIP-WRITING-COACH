@@ -34,6 +34,25 @@ export interface FeedbackData {
   corrections: Correction[];
 }
 
+// New CLB-based feedback format
+export interface CriterionAnalysis {
+  celpipScore: number; // 0-12 scale
+  clbLevel: number; // 1-12 CLB level
+  analysis: string;
+  improvementToNextLevel: string;
+}
+
+export interface CLBFeedbackData {
+  overallCLB: number;
+  criteriaAnalysis: {
+    content: CriterionAnalysis;
+    vocabulary: CriterionAnalysis;
+    readability: CriterionAnalysis;
+    taskFulfillment: CriterionAnalysis;
+  };
+  keyCorrections: Correction[];
+}
+
 export const TASK_PROMPTS = {
   task1: {
     en: "You received an email from a friend who is planning to visit your city. Write an email response (150-200 words) that includes:\n\n• Welcome them to your city\n• Suggest 2-3 places they should visit\n• Offer to help with their trip planning\n• Ask about their arrival date and duration of stay",
