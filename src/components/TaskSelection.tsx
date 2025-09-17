@@ -12,11 +12,11 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
   const { i18n } = useTranslation();
   const [showCustomUpload, setShowCustomUpload] = useState(false);
 
-  const tasks: TaskType[] = [
+  const emailTasks: TaskType[] = [
     {
       id: 'task1',
-      title: 'Email: Friend Visit',
-      description: 'Write to a friend planning to visit your city',
+      title: 'Friend Visit',
+      description: 'Welcome a friend planning to visit your city',
       prompt: TASK_PROMPTS.task1[i18n.language as keyof typeof TASK_PROMPTS.task1] || TASK_PROMPTS.task1.en,
       timeLimit: 27,
       wordLimit: { min: 150, max: 200 },
@@ -24,7 +24,7 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
     },
     {
       id: 'task3',
-      title: 'Email: Missed Meeting',
+      title: 'Missed Meeting',
       description: 'Apologize to supervisor for missing important meeting',
       prompt: TASK_PROMPTS.task3[i18n.language as keyof typeof TASK_PROMPTS.task3] || TASK_PROMPTS.task3.en,
       timeLimit: 27,
@@ -33,7 +33,7 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
     },
     {
       id: 'task4',
-      title: 'Email: Join Sports Team',
+      title: 'Join Sports Team',
       description: 'Request to join local sports team without experience',
       prompt: TASK_PROMPTS.task4[i18n.language as keyof typeof TASK_PROMPTS.task4] || TASK_PROMPTS.task4.en,
       timeLimit: 27,
@@ -41,8 +41,65 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
       type: 'email'
     },
     {
+      id: 'task7',
+      title: 'Restaurant Complaint',
+      description: 'Complain about poor service at a restaurant',
+      prompt: TASK_PROMPTS.task7[i18n.language as keyof typeof TASK_PROMPTS.task7] || TASK_PROMPTS.task7.en,
+      timeLimit: 27,
+      wordLimit: { min: 150, max: 200 },
+      type: 'email'
+    },
+    {
+      id: 'task8',
+      title: 'Gym Membership',
+      description: 'Cancel gym membership instead of renewing',
+      prompt: TASK_PROMPTS.task8[i18n.language as keyof typeof TASK_PROMPTS.task8] || TASK_PROMPTS.task8.en,
+      timeLimit: 27,
+      wordLimit: { min: 150, max: 200 },
+      type: 'email'
+    },
+    {
+      id: 'task9',
+      title: 'Noisy Neighbors',
+      description: 'Complain to landlord about noise problems',
+      prompt: TASK_PROMPTS.task9[i18n.language as keyof typeof TASK_PROMPTS.task9] || TASK_PROMPTS.task9.en,
+      timeLimit: 27,
+      wordLimit: { min: 150, max: 200 },
+      type: 'email'
+    },
+    {
+      id: 'task10',
+      title: 'Job Application',
+      description: 'Apply for part-time job at local bookstore',
+      prompt: TASK_PROMPTS.task10[i18n.language as keyof typeof TASK_PROMPTS.task10] || TASK_PROMPTS.task10.en,
+      timeLimit: 27,
+      wordLimit: { min: 150, max: 200 },
+      type: 'email'
+    },
+    {
+      id: 'task11',
+      title: 'School Programs',
+      description: 'Object to cutting arts programs at school',
+      prompt: TASK_PROMPTS.task11[i18n.language as keyof typeof TASK_PROMPTS.task11] || TASK_PROMPTS.task11.en,
+      timeLimit: 27,
+      wordLimit: { min: 150, max: 200 },
+      type: 'email'
+    },
+    {
+      id: 'task12',
+      title: 'Damaged Product',
+      description: 'Return damaged laptop ordered online',
+      prompt: TASK_PROMPTS.task12[i18n.language as keyof typeof TASK_PROMPTS.task12] || TASK_PROMPTS.task12.en,
+      timeLimit: 27,
+      wordLimit: { min: 150, max: 200 },
+      type: 'email'
+    }
+  ];
+
+  const surveyTasks: TaskType[] = [
+    {
       id: 'task2',
-      title: 'Survey: Social Media Impact',
+      title: 'Social Media Impact',
       description: 'Opinion on social media effects on society',
       prompt: TASK_PROMPTS.task2[i18n.language as keyof typeof TASK_PROMPTS.task2] || TASK_PROMPTS.task2.en,
       timeLimit: 26,
@@ -51,7 +108,7 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
     },
     {
       id: 'task5',
-      title: 'Survey: School Subject Choice',
+      title: 'School Subject Choice',
       description: 'Students choosing subjects vs standard curriculum',
       prompt: TASK_PROMPTS.task5[i18n.language as keyof typeof TASK_PROMPTS.task5] || TASK_PROMPTS.task5.en,
       timeLimit: 26,
@@ -60,9 +117,63 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
     },
     {
       id: 'task6',
-      title: 'Survey: Shopping Mall vs Park',
+      title: 'Shopping Mall vs Park',
       description: 'Choose between new shopping mall or public park',
       prompt: TASK_PROMPTS.task6[i18n.language as keyof typeof TASK_PROMPTS.task6] || TASK_PROMPTS.task6.en,
+      timeLimit: 26,
+      wordLimit: { min: 250, max: 300 },
+      type: 'survey'
+    },
+    {
+      id: 'task13',
+      title: 'Working from Home',
+      description: 'Compare productivity of home vs office work',
+      prompt: TASK_PROMPTS.task13[i18n.language as keyof typeof TASK_PROMPTS.task13] || TASK_PROMPTS.task13.en,
+      timeLimit: 26,
+      wordLimit: { min: 250, max: 300 },
+      type: 'survey'
+    },
+    {
+      id: 'task14',
+      title: 'Bike-sharing Programs',
+      description: 'Opinion on city bike-sharing initiatives',
+      prompt: TASK_PROMPTS.task14[i18n.language as keyof typeof TASK_PROMPTS.task14] || TASK_PROMPTS.task14.en,
+      timeLimit: 26,
+      wordLimit: { min: 250, max: 300 },
+      type: 'survey'
+    },
+    {
+      id: 'task15',
+      title: 'Mental Health Days',
+      description: 'Should companies provide mental health days',
+      prompt: TASK_PROMPTS.task15[i18n.language as keyof typeof TASK_PROMPTS.task15] || TASK_PROMPTS.task15.en,
+      timeLimit: 26,
+      wordLimit: { min: 250, max: 300 },
+      type: 'survey'
+    },
+    {
+      id: 'task16',
+      title: 'Shopping Preferences',
+      description: 'Large chains vs small local businesses',
+      prompt: TASK_PROMPTS.task16[i18n.language as keyof typeof TASK_PROMPTS.task16] || TASK_PROMPTS.task16.en,
+      timeLimit: 26,
+      wordLimit: { min: 250, max: 300 },
+      type: 'survey'
+    },
+    {
+      id: 'task17',
+      title: 'Free Public Transportation',
+      description: 'Should government make public transport free',
+      prompt: TASK_PROMPTS.task17[i18n.language as keyof typeof TASK_PROMPTS.task17] || TASK_PROMPTS.task17.en,
+      timeLimit: 26,
+      wordLimit: { min: 250, max: 300 },
+      type: 'survey'
+    },
+    {
+      id: 'task18',
+      title: 'Extended School Hours',
+      description: 'Should schools extend the school day',
+      prompt: TASK_PROMPTS.task18[i18n.language as keyof typeof TASK_PROMPTS.task18] || TASK_PROMPTS.task18.en,
       timeLimit: 26,
       wordLimit: { min: 250, max: 300 },
       type: 'survey'
@@ -124,7 +235,7 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tasks.filter(task => task.type === 'email').map((task, index) => (
+          {emailTasks.map((task, index) => (
             <div
               key={task.id}
               className="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-200"
@@ -134,7 +245,7 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
                   {getTaskIcon(task.type, task.id)}
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900">{task.title.replace('Email: ', '')}</h4>
+                  <h4 className="text-lg font-semibold text-gray-900">{task.title}</h4>
                   <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600">
                     Task 1
                   </span>
@@ -171,7 +282,7 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tasks.filter(task => task.type === 'survey').map((task, index) => (
+          {surveyTasks.map((task, index) => (
             <div
               key={task.id}
               className="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:border-green-200"
@@ -181,7 +292,7 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900">{task.title.replace('Survey: ', '')}</h4>
+                  <h4 className="text-lg font-semibold text-gray-900">{task.title}</h4>
                   <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-600">
                     Task 2
                   </span>
