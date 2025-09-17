@@ -91,13 +91,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const loginWithGoogle = async () => {
     // Demo mode - simulate Google login
+    // In production, this would use Firebase Auth with Google provider
     const demoUser = {
-      uid: 'demo-google-user',
-      email: 'demo@google.com',
+      uid: 'demo-google-user-' + Date.now(),
+      email: 'demo.user@gmail.com',
       displayName: 'Demo Google User'
     } as User;
     
-    const profile = createDemoProfile('demo@google.com', 'Demo Google User');
+    const profile = createDemoProfile('demo.user@gmail.com', 'Demo Google User');
     setCurrentUser(demoUser);
     setUserProfile(profile);
     

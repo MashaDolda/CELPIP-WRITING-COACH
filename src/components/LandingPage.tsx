@@ -193,32 +193,78 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Testimonials */}
+      {/* Platform Features Highlight */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Student Success Stories
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Why Choose Our CELPIP Writing Coach?
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              See how our students achieved their target CLB levels
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Advanced AI technology combined with authentic CELPIP methodology
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
-                  </div>
-                  <span className="ml-2 text-sm font-medium text-green-600">{testimonial.clb}</span>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-blue-600" />
                 </div>
-                <p className="text-gray-600 mb-4">"{testimonial.text}"</p>
-                <div className="font-medium text-gray-900">{testimonial.name}</div>
+                <div className="ml-4">
+                  <h4 className="font-semibold text-gray-900">50+ Practice Tasks</h4>
+                  <p className="text-gray-600 text-sm">Comprehensive Task Library</p>
+                </div>
               </div>
-            ))}
+              <p className="text-gray-700 mb-4">
+                Access a vast collection of authentic CELPIP tasks organized by difficulty level, category, and CLB target level for focused practice.
+              </p>
+              <div className="flex items-center">
+                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                  Beginner to Advanced
+                </span>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <Target className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <h4 className="font-semibold text-gray-900">Personalized Feedback</h4>
+                  <p className="text-gray-600 text-sm">AI-Powered Analysis</p>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4">
+                Receive detailed CLB-level analysis with specific examples from your writing, targeted corrections, and clear improvement strategies.
+              </p>
+              <div className="flex items-center">
+                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                  CLB-Aligned Scoring
+                </span>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-purple-600" />
+                </div>
+                <div className="ml-4">
+                  <h4 className="font-semibold text-gray-900">Progress Tracking</h4>
+                  <p className="text-gray-600 text-sm">Goal-Oriented Learning</p>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4">
+                Monitor your improvement with detailed analytics, essay history, and personalized study plans based on your specific CLB goals.
+              </p>
+              <div className="flex items-center">
+                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+                  Smart Analytics
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
