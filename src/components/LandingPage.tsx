@@ -4,13 +4,9 @@ import {
   PenTool, 
   Target, 
   TrendingUp, 
-  Users, 
   Star, 
-  CheckCircle, 
   ArrowRight,
-  Award,
-  BookOpen,
-  BarChart3
+  BookOpen
 } from 'lucide-react';
 
 const LandingPage: React.FC = () => {

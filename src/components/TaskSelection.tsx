@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, FileText, Upload, ChevronLeft, ChevronRight, Star, Users, Trophy } from 'lucide-react';
-import { TaskType, TASK_PROMPTS } from '../types';
+import { TaskType } from '../types';
+import { EMAIL_TASKS, SURVEY_TASKS, getFreeTasksOnly, getPremiumTasks } from '../data/taskLibrary';
 import CustomTaskUpload from './CustomTaskUpload';
 
 interface TaskSelectionProps {
@@ -279,8 +280,8 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
           
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             {getCurrentPageTasks(emailTasks, emailPage).map((task, index) => (
-              <div 
-                key={task.id} 
+          <div
+            key={task.id}
                 className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
                 onClick={() => onTaskSelect(task)}
               >
@@ -327,7 +328,7 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
             <div className="text-sm text-gray-500">
               Showing {emailPage * TASKS_PER_PAGE + 1}-{Math.min((emailPage + 1) * TASKS_PER_PAGE, emailTasks.length)} of {emailTasks.length} email tasks
             </div>
-            
+
             <button
               onClick={() => setEmailPage(Math.min(getTotalPages(emailTasks) - 1, emailPage + 1))}
               disabled={emailPage >= getTotalPages(emailTasks) - 1}
@@ -409,7 +410,7 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
             <div className="text-sm text-gray-500">
               Showing {surveyPage * TASKS_PER_PAGE + 1}-{Math.min((surveyPage + 1) * TASKS_PER_PAGE, surveyTasks.length)} of {surveyTasks.length} survey tasks
             </div>
-            
+
             <button
               onClick={() => setSurveyPage(Math.min(getTotalPages(surveyTasks) - 1, surveyPage + 1))}
               disabled={surveyPage >= getTotalPages(surveyTasks) - 1}
@@ -473,7 +474,7 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
               🚀 Upload Your Task
             </button>
           </div>
-        </div>
+      </div>
       )}
     </div>
   );
