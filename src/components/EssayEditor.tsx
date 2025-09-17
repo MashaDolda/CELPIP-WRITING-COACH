@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, FileText, ArrowLeft, Send } from 'lucide-react';
+import { Clock, FileText, ArrowLeft, Send, Play, Pause, Square, RotateCcw } from 'lucide-react';
 import { TaskType, EssayData } from '../types';
 
 interface EssayEditorProps {
@@ -14,28 +14,70 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ task, onSubmit, onBack }) => 
   const [essay, setEssay] = useState('');
   const [timeLeft, setTimeLeft] = useState(task.timeLimit * 60); // Convert to seconds
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTimerRunning, setIsTimerRunning] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
 
   const wordCount = essay.trim().split(/\s+/).filter(word => word.length > 0).length;
   const isWithinWordLimit = wordCount >= task.wordLimit.min && wordCount <= task.wordLimit.max;
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    let timer: NodeJS.Timeout;
+    
+    if (isTimerRunning && !isPaused && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            setIsTimerRunning(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
 
-    return () => clearInterval(timer);
-  }, []);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isTimerRunning, isPaused, timeLeft]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const handlePauseTimer = () => {
+    setIsPaused(!isPaused);
+  };
+
+  const handleStopTimer = () => {
+    setIsTimerRunning(false);
+    setIsPaused(false);
+  };
+
+  const handleRestartTimer = () => {
+    setTimeLeft(task.timeLimit * 60);
+    setIsTimerRunning(true);
+    setIsPaused(false);
+  };
+
+  const handleStartTimer = () => {
+    setIsTimerRunning(true);
+    setIsPaused(false);
+  };
+
+  const getTimerColor = () => {
+    if (timeLeft === 0) return 'text-red-600';
+    if (timeLeft < 300) return 'text-orange-600'; // Less than 5 minutes
+    if (isPaused) return 'text-yellow-600';
+    return 'text-gray-700';
+  };
+
+  const getTimerBgColor = () => {
+    if (timeLeft === 0) return 'bg-red-50 border-red-200';
+    if (timeLeft < 300) return 'bg-orange-50 border-orange-200';
+    if (isPaused) return 'bg-yellow-50 border-yellow-200';
+    return 'bg-gray-50 border-gray-200';
   };
 
   const handleSubmit = async () => {
@@ -67,17 +109,61 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ task, onSubmit, onBack }) => 
           </button>
           
           <div className="flex items-center space-x-6">
-            <div className="flex items-center text-gray-600">
-              <Clock className="w-4 h-4 mr-2" />
-              <span className={timeLeft < 300 ? 'text-red-600 font-semibold' : ''}>
-                {formatTime(timeLeft)}
-              </span>
+            {/* Timer with Controls */}
+            <div className={`flex items-center px-4 py-2 rounded-lg border ${getTimerBgColor()}`}>
+              <Clock className={`w-5 h-5 mr-3 ${getTimerColor()}`} />
+              <div className="flex flex-col items-center mr-4">
+                <span className={`text-2xl font-bold ${getTimerColor()}`}>
+                  {formatTime(timeLeft)}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {isPaused ? 'PAUSED' : timeLeft === 0 ? 'TIME UP' : isTimerRunning ? 'RUNNING' : 'STOPPED'}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                {isTimerRunning && !isPaused ? (
+                  <button
+                    onClick={handlePauseTimer}
+                    className="p-2 text-yellow-600 hover:bg-yellow-100 rounded-lg transition-colors"
+                    title="Pause Timer"
+                  >
+                    <Pause className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={isPaused ? handlePauseTimer : handleStartTimer}
+                    className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
+                    title={isPaused ? "Resume Timer" : "Start Timer"}
+                  >
+                    <Play className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  onClick={handleStopTimer}
+                  className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                  title="Stop Timer"
+                >
+                  <Square className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleRestartTimer}
+                  className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                  title="Restart Timer"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center text-gray-600">
-              <FileText className="w-4 h-4 mr-2" />
-              <span className={!isWithinWordLimit ? 'text-red-600' : 'text-green-600'}>
-                {wordCount} / {task.wordLimit.min}-{task.wordLimit.max}
-              </span>
+
+            {/* Word Count */}
+            <div className="flex items-center px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+              <FileText className="w-5 h-5 mr-3 text-blue-600" />
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-blue-700">
+                  {wordCount}
+                </span>
+                <span className="text-xs text-blue-500">WORDS</span>
+              </div>
             </div>
           </div>
         </div>
@@ -98,17 +184,24 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ task, onSubmit, onBack }) => 
           onChange={(e) => setEssay(e.target.value)}
           placeholder="Start writing your response here..."
           className="w-full h-96 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
-          disabled={timeLeft === 0 || isSubmitting}
+          disabled={isSubmitting}
         />
 
         <div className="flex items-center justify-between mt-6">
-          <div className="text-sm text-gray-500">
-            {t('wordCount')}: <span className={!isWithinWordLimit ? 'text-red-600 font-semibold' : 'text-green-600 font-semibold'}>{wordCount}</span>
+          <div className="flex items-center space-x-4">
+            <div className="text-sm text-gray-500">
+              Target: <span className="text-gray-700 font-medium">{task.wordLimit.min}-{task.wordLimit.max} words</span>
+            </div>
+            {!isWithinWordLimit && (
+              <div className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded">
+                {wordCount < task.wordLimit.min ? 'Too few words' : 'Too many words'}
+              </div>
+            )}
           </div>
           
           <button
             onClick={handleSubmit}
-            disabled={!essay.trim() || timeLeft === 0 || isSubmitting}
+            disabled={!essay.trim() || isSubmitting}
             className="flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? (
@@ -127,7 +220,13 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ task, onSubmit, onBack }) => 
 
         {timeLeft === 0 && (
           <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800 font-medium">Time's up! Please submit your essay.</p>
+            <p className="text-red-800 font-medium">⏰ Time's up! You can continue writing or submit your essay.</p>
+          </div>
+        )}
+
+        {isPaused && (
+          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-yellow-800 font-medium">⏸️ Timer is paused. Click the play button to resume.</p>
           </div>
         )}
       </div>
