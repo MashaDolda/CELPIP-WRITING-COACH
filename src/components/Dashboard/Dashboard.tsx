@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '../../config/firebase';
+import { getUserEssays } from '../../services/essayService';
 import { 
   User, 
   PenTool, 
@@ -37,24 +36,19 @@ const Dashboard: React.FC = () => {
       if (!currentUser) return;
 
       try {
-        const essaysQuery = query(
-          collection(db, 'essays'),
-          where('userId', '==', currentUser.uid),
-          orderBy('createdAt', 'desc'),
-          limit(10)
-        );
+        const essays = await getUserEssays(currentUser.uid);
+        const essayHistory: EssayHistory[] = essays.slice(0, 10).map((essay, index) => ({
+          id: `essay-${index}`,
+          taskTitle: essay.taskTitle,
+          overallCLB: essay.overallCLB,
+          createdAt: new Date(essay.createdAt),
+          wordCount: essay.wordCount
+        }));
 
-        const snapshot = await getDocs(essaysQuery);
-        const essays: EssayHistory[] = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt.toDate()
-        })) as EssayHistory[];
-
-        setEssayHistory(essays);
+        setEssayHistory(essayHistory);
 
         // Create progress data for chart
-        const chartData = essays.reverse().map((essay, index) => ({
+        const chartData = essayHistory.reverse().map((essay, index) => ({
           essay: index + 1,
           clb: essay.overallCLB,
           date: essay.createdAt.toLocaleDateString()

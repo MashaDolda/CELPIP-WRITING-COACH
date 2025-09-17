@@ -1,16 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { 
-  User,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithPopup,
-  updateProfile
-} from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../config/firebase';
+import { User } from 'firebase/auth';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -47,76 +36,92 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+// Demo mode - temporary until Firebase is set up
 export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Set to false for demo mode
 
-  const createUserProfile = async (user: User, name?: string) => {
-    const userProfile: UserProfile = {
-      uid: user.uid,
-      name: name || user.displayName || 'CELPIP Student',
-      email: user.email || '',
+  const createDemoProfile = (email: string, name: string): UserProfile => {
+    return {
+      uid: 'demo-user-' + Date.now(),
+      name,
+      email,
       createdAt: new Date(),
       totalEssays: 0,
       averageCLB: 0,
       targetCLB: 9,
       currentStreak: 0
     };
-
-    await setDoc(doc(db, 'users', user.uid), userProfile);
-    return userProfile;
-  };
-
-  const fetchUserProfile = async (user: User) => {
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    if (userDoc.exists()) {
-      return userDoc.data() as UserProfile;
-    } else {
-      return await createUserProfile(user);
-    }
   };
 
   const signup = async (email: string, password: string, name: string) => {
-    const { user } = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(user, { displayName: name });
-    await createUserProfile(user, name);
+    // Demo mode - simulate successful signup
+    const demoUser = {
+      uid: 'demo-user-' + Date.now(),
+      email,
+      displayName: name
+    } as User;
+    
+    const profile = createDemoProfile(email, name);
+    setCurrentUser(demoUser);
+    setUserProfile(profile);
+    
+    // Store in localStorage for demo persistence
+    localStorage.setItem('demo-user', JSON.stringify(demoUser));
+    localStorage.setItem('demo-profile', JSON.stringify(profile));
   };
 
   const login = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    // Demo mode - simulate successful login
+    const demoUser = {
+      uid: 'demo-user-' + Date.now(),
+      email,
+      displayName: 'Demo User'
+    } as User;
+    
+    const profile = createDemoProfile(email, 'Demo User');
+    setCurrentUser(demoUser);
+    setUserProfile(profile);
+    
+    // Store in localStorage for demo persistence
+    localStorage.setItem('demo-user', JSON.stringify(demoUser));
+    localStorage.setItem('demo-profile', JSON.stringify(profile));
   };
 
   const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    const { user } = await signInWithPopup(auth, provider);
+    // Demo mode - simulate Google login
+    const demoUser = {
+      uid: 'demo-google-user',
+      email: 'demo@google.com',
+      displayName: 'Demo Google User'
+    } as User;
     
-    // Check if user profile exists, create if not
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    if (!userDoc.exists()) {
-      await createUserProfile(user);
-    }
+    const profile = createDemoProfile('demo@google.com', 'Demo Google User');
+    setCurrentUser(demoUser);
+    setUserProfile(profile);
+    
+    // Store in localStorage for demo persistence
+    localStorage.setItem('demo-user', JSON.stringify(demoUser));
+    localStorage.setItem('demo-profile', JSON.stringify(profile));
   };
 
   const logout = async () => {
-    await signOut(auth);
+    setCurrentUser(null);
+    setUserProfile(null);
+    localStorage.removeItem('demo-user');
+    localStorage.removeItem('demo-profile');
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
-      
-      if (user) {
-        const profile = await fetchUserProfile(user);
-        setUserProfile(profile);
-      } else {
-        setUserProfile(null);
-      }
-      
-      setLoading(false);
-    });
-
-    return unsubscribe;
+    // Check for stored demo user
+    const storedUser = localStorage.getItem('demo-user');
+    const storedProfile = localStorage.getItem('demo-profile');
+    
+    if (storedUser && storedProfile) {
+      setCurrentUser(JSON.parse(storedUser));
+      setUserProfile(JSON.parse(storedProfile));
+    }
   }, []);
 
   const value: AuthContextType = {
@@ -131,7 +136,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }

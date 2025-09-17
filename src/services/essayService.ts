@@ -1,5 +1,3 @@
-import { collection, addDoc, updateDoc, doc, increment, serverTimestamp } from 'firebase/firestore';
-import { db } from '../config/firebase';
 import { EssayData, FeedbackData } from '../types';
 
 interface EssayRecord {
@@ -17,16 +15,16 @@ interface EssayRecord {
     taskFulfillment: number;
   };
   feedback: FeedbackData;
-  createdAt: any;
+  createdAt: Date;
 }
 
+// Demo mode - store in localStorage until Firebase is set up
 export const saveEssayResult = async (
   userId: string,
   essay: EssayData,
   feedback: FeedbackData
 ): Promise<void> => {
   try {
-    // Save the essay record
     const essayRecord: EssayRecord = {
       userId,
       taskTitle: essay.task.title,
@@ -37,28 +35,32 @@ export const saveEssayResult = async (
       overallCLB: feedback.overallScore,
       criteriaScores: feedback.scores,
       feedback,
-      createdAt: serverTimestamp()
+      createdAt: new Date()
     };
 
-    await addDoc(collection(db, 'essays'), essayRecord);
+    // Store in localStorage for demo mode
+    const existingEssays = JSON.parse(localStorage.getItem('demo-essays') || '[]');
+    existingEssays.push(essayRecord);
+    localStorage.setItem('demo-essays', JSON.stringify(existingEssays));
 
-    // Update user statistics
-    const userRef = doc(db, 'users', userId);
-    await updateDoc(userRef, {
-      totalEssays: increment(1),
-      averageCLB: feedback.overallScore, // This should be calculated as running average
-      lastEssayDate: serverTimestamp()
-    });
-
-    console.log('Essay result saved successfully');
+    console.log('Essay result saved to local storage (demo mode)');
   } catch (error) {
     console.error('Error saving essay result:', error);
-    throw error;
   }
 };
 
+export const getUserEssays = async (userId: string): Promise<EssayRecord[]> => {
+  // Get essays from localStorage for demo mode
+  const essays = JSON.parse(localStorage.getItem('demo-essays') || '[]');
+  return essays
+    .filter((essay: EssayRecord) => essay.userId === userId)
+    .sort((a: EssayRecord, b: EssayRecord) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+};
+
 export const calculateUserAverage = async (userId: string, newCLB: number): Promise<number> => {
-  // This would typically fetch all user essays and calculate average
-  // For now, we'll use a simple approach
-  return newCLB;
+  const essays = await getUserEssays(userId);
+  if (essays.length === 0) return newCLB;
+  
+  const total = essays.reduce((sum, essay) => sum + essay.overallCLB, 0);
+  return Math.round((total / essays.length) * 10) / 10;
 };
