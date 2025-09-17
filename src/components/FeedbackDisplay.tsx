@@ -149,11 +149,6 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ essay, feedback, onBa
     return strategies[criterion]?.[Math.min(score, 9)] || "Continue practicing to improve this area.";
   };
 
-  const getMaintenanceStrategy = (criterion: string, score: number) => {
-    if (score >= 10) return "Keep practicing to maintain this excellent level.";
-    if (score >= 8) return "Continue using varied techniques to reach the next level.";
-    return "Build on this strength while focusing on weaker areas.";
-  };
 
   // Get specific examples from the student's writing for each criterion
   const getWritingExamples = (criterion: string, score: number, essayContent: string) => {
