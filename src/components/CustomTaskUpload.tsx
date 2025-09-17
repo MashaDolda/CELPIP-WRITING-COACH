@@ -9,7 +9,7 @@ interface CustomTaskUploadProps {
 
 const CustomTaskUpload: React.FC<CustomTaskUploadProps> = ({ onTaskCreate, onCancel }) => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [extractedText, setExtractedText] = useState('');
+  // const [extractedText, setExtractedText] = useState(''); // For future OCR feature
   const [customPrompt, setCustomPrompt] = useState('');
   const [taskType, setTaskType] = useState<'email' | 'survey'>('email');
   const [wordLimit, setWordLimit] = useState({ min: 150, max: 200 });

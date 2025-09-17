@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Mail, FileText, Clock, Target, Users, Trophy, Upload, Building } from 'lucide-react';
+import { Mail, FileText, Clock, Target, Users, Trophy, Upload } from 'lucide-react';
 import { TaskType, TASK_PROMPTS } from '../types';
 import CustomTaskUpload from './CustomTaskUpload';
 
@@ -9,7 +9,7 @@ interface TaskSelectionProps {
 }
 
 const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const [showCustomUpload, setShowCustomUpload] = useState(false);
 
   const tasks: TaskType[] = [
@@ -104,77 +104,135 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-8">
+      <div className="text-center mb-12">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Choose Your CELPIP Writing Task</h2>
         <p className="text-lg text-gray-600">
-          Select from authentic CELPIP tasks or upload your own
+          Select from authentic CELPIP tasks organized by type, or upload your own
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {tasks.map((task, index) => (
-          <div
-            key={task.id}
-            className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300"
-          >
-            <div className="flex items-center mb-4">
-              <div className={`p-3 rounded-lg ${getTaskColor(task.type, index)}`}>
-                {getTaskIcon(task.type, task.id)}
-              </div>
-              <div className="ml-3">
-                <h3 className="text-lg font-semibold text-gray-900">{task.title}</h3>
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  task.type === 'email' ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'
-                }`}>
-                  {task.type === 'email' ? 'Task 1' : 'Task 2'}
-                </span>
-              </div>
-            </div>
-
-            <p className="text-gray-600 mb-4 text-sm">{task.description}</p>
-
-            <div className="space-y-2 mb-4">
-              <div className="flex items-center text-sm text-gray-500">
-                <Clock className="w-4 h-4 mr-2" />
-                <span>{task.timeLimit} minutes</span>
-              </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <Target className="w-4 h-4 mr-2" />
-                <span>{task.wordLimit.min}-{task.wordLimit.max} words</span>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-3 mb-4">
-              <h4 className="font-medium text-gray-900 mb-1 text-sm">Task Prompt:</h4>
-              <p className="text-xs text-gray-700 line-clamp-4">{task.prompt.substring(0, 120)}...</p>
-            </div>
-
-            <button
-              onClick={() => onTaskSelect(task)}
-              className={`w-full py-2 px-4 rounded-lg font-medium transition-colors text-sm ${getButtonColor(task.type, index)}`}
-            >
-              Start Writing
-            </button>
+      {/* Task 1: Email Writing Section */}
+      <div className="mb-12">
+        <div className="flex items-center mb-6">
+          <div className="p-3 rounded-lg bg-blue-100 text-blue-600 mr-4">
+            <Mail className="w-8 h-8" />
           </div>
-        ))}
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900">Task 1: Email Writing</h3>
+            <p className="text-gray-600">150-200 words • 27 minutes • Formal and informal emails</p>
+          </div>
+        </div>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tasks.filter(task => task.type === 'email').map((task, index) => (
+            <div
+              key={task.id}
+              className="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-200"
+            >
+              <div className="flex items-center mb-4">
+                <div className="p-2 rounded-lg bg-blue-50 text-blue-600 mr-3">
+                  {getTaskIcon(task.type, task.id)}
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900">{task.title.replace('Email: ', '')}</h4>
+                  <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600">
+                    Task 1
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-gray-600 mb-4 text-sm">{task.description}</p>
+
+              <div className="bg-blue-50 rounded-lg p-3 mb-4">
+                <p className="text-xs text-blue-700 line-clamp-3">{task.prompt.substring(0, 100)}...</p>
+              </div>
+
+              <button
+                onClick={() => onTaskSelect(task)}
+                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors text-sm"
+              >
+                Start Writing
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Custom Upload Option */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-dashed border-purple-200 p-8 text-center">
-        <div className="max-w-md mx-auto">
-          <div className="p-4 rounded-full bg-purple-100 text-purple-600 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+      {/* Task 2: Survey Response Section */}
+      <div className="mb-12">
+        <div className="flex items-center mb-6">
+          <div className="p-3 rounded-lg bg-green-100 text-green-600 mr-4">
+            <FileText className="w-8 h-8" />
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900">Task 2: Responding to Survey Questions</h3>
+            <p className="text-gray-600">250-300 words • 26 minutes • Opinion essays with examples</p>
+          </div>
+        </div>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tasks.filter(task => task.type === 'survey').map((task, index) => (
+            <div
+              key={task.id}
+              className="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:border-green-200"
+            >
+              <div className="flex items-center mb-4">
+                <div className="p-2 rounded-lg bg-green-50 text-green-600 mr-3">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900">{task.title.replace('Survey: ', '')}</h4>
+                  <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-600">
+                    Task 2
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-gray-600 mb-4 text-sm">{task.description}</p>
+
+              <div className="bg-green-50 rounded-lg p-3 mb-4">
+                <p className="text-xs text-green-700 line-clamp-3">{task.prompt.substring(0, 100)}...</p>
+              </div>
+
+              <button
+                onClick={() => onTaskSelect(task)}
+                className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors text-sm"
+              >
+                Start Writing
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Custom Upload Section */}
+      <div className="mb-12">
+        <div className="flex items-center mb-6">
+          <div className="p-3 rounded-lg bg-purple-100 text-purple-600 mr-4">
             <Upload className="w-8 h-8" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Upload Your Own Task</h3>
-          <p className="text-gray-600 mb-6">
-            Have a specific CELPIP task you want to practice? Upload an image and get personalized feedback.
-          </p>
-          <button
-            onClick={() => setShowCustomUpload(true)}
-            className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium transition-colors"
-          >
-            Upload Custom Task
-          </button>
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900">Custom Task Upload</h3>
+            <p className="text-gray-600">Upload your own CELPIP task image • Any word count • Custom time</p>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-dashed border-purple-200 p-8 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="p-4 rounded-full bg-purple-100 text-purple-600 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <Upload className="w-8 h-8" />
+            </div>
+            <h4 className="text-xl font-semibold text-gray-900 mb-2">Upload Your Own Task</h4>
+            <p className="text-gray-600 mb-6">
+              Have a specific CELPIP task you want to practice? Upload an image and get personalized feedback.
+            </p>
+            <button
+              onClick={() => setShowCustomUpload(true)}
+              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium transition-colors"
+            >
+              Upload Custom Task
+            </button>
+          </div>
         </div>
       </div>
     </div>
