@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Mail, FileText, Clock, Target, Users, Trophy, Upload } from 'lucide-react';
+import { Mail, FileText, Upload, ChevronLeft, ChevronRight, Star, Users, Trophy } from 'lucide-react';
 import { TaskType, TASK_PROMPTS } from '../types';
 import CustomTaskUpload from './CustomTaskUpload';
 
@@ -11,6 +11,11 @@ interface TaskSelectionProps {
 const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
   const { i18n } = useTranslation();
   const [showCustomUpload, setShowCustomUpload] = useState(false);
+  const [activeTab, setActiveTab] = useState<'email' | 'survey' | 'custom'>('email');
+  const [emailPage, setEmailPage] = useState(0);
+  const [surveyPage, setSurveyPage] = useState(0);
+  
+  const TASKS_PER_PAGE = 3;
 
   const emailTasks: TaskType[] = [
     {
