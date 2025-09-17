@@ -60,7 +60,7 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ essay, feedback, onBa
           <div className="flex items-center space-x-2">
             <Star className="w-5 h-5 text-yellow-500" />
             <span className="text-lg font-semibold text-gray-900">
-              {t('overallScore')}: {feedback.overallScore}/12
+              Overall CLB Level: {feedback.overallScore}
             </span>
           </div>
         </div>
@@ -71,7 +71,7 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ essay, feedback, onBa
 
       {/* Scores */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">CELPIP Criteria Scores</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">CLB Levels by Criteria</h3>
         
         <div className="grid md:grid-cols-2 gap-4">
           {Object.entries(feedback.scores).map(([criterion, score]) => (
@@ -86,7 +86,7 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ essay, feedback, onBa
                   </span>
                 </div>
                 <div className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreColor(score)}`}>
-                  {score}/12
+                  CLB {score}
                 </div>
               </div>
               <p className="text-sm text-gray-600">{getScoreDescription(score)}</p>

@@ -42,7 +42,34 @@ function App() {
     if (!response.ok) {
       throw new Error('Failed to get AI feedback');
     }
-    return await response.json();
+    
+    const clbData = await response.json();
+    
+    // Check if we have the new CLB format or old format
+    if (clbData.criteriaAnalysis) {
+      // Convert new CLB format to old format for compatibility
+      const convertedFeedback: FeedbackData = {
+        scores: {
+          content: clbData.criteriaAnalysis?.content?.celpipScore || 0,
+          vocabulary: clbData.criteriaAnalysis?.vocabulary?.celpipScore || 0,
+          readability: clbData.criteriaAnalysis?.readability?.celpipScore || 0,
+          taskFulfillment: clbData.criteriaAnalysis?.taskFulfillment?.celpipScore || 0
+        },
+        overallScore: clbData.overallCLB || 0,
+        recommendations: [
+          `📝 Content (CLB ${clbData.criteriaAnalysis?.content?.clbLevel}): ${clbData.criteriaAnalysis?.content?.improvementToNextLevel}`,
+          `📚 Vocabulary (CLB ${clbData.criteriaAnalysis?.vocabulary?.clbLevel}): ${clbData.criteriaAnalysis?.vocabulary?.improvementToNextLevel}`,
+          `✍️ Readability (CLB ${clbData.criteriaAnalysis?.readability?.clbLevel}): ${clbData.criteriaAnalysis?.readability?.improvementToNextLevel}`,
+          `🎯 Task Fulfillment (CLB ${clbData.criteriaAnalysis?.taskFulfillment?.clbLevel}): ${clbData.criteriaAnalysis?.taskFulfillment?.improvementToNextLevel}`
+        ],
+        corrections: clbData.keyCorrections || []
+      };
+      
+      return convertedFeedback;
+    } else {
+      // Old format - return as is
+      return clbData;
+    }
   };
 
   return (
