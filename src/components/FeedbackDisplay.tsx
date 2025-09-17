@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Target, Eye, CheckCircle, Star, Lightbulb, ChevronDown, ChevronUp, Info, TrendingUp, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, BookOpen, Target, Eye, CheckCircle, Star, Lightbulb, ChevronDown, ChevronUp, Info, TrendingUp } from 'lucide-react';
 import { EssayData, FeedbackData } from '../types';
 
 interface FeedbackDisplayProps {
