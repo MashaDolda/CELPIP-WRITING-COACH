@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Target, Eye, CheckCircle, Star, Lightbulb, ChevronDown, ChevronUp, Info, TrendingUp } from 'lucide-react';
+import { ArrowLeft, BookOpen, Target, Eye, CheckCircle, Star, Lightbulb, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { EssayData, FeedbackData } from '../types';
 
 interface FeedbackDisplayProps {
@@ -101,58 +101,6 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ essay, feedback, onBa
     return explanations[criterion]?.[score] || "Score explanation not available.";
   };
 
-  // Calculate strategic recommendations based on score distribution
-  const getStrategicRecommendations = () => {
-    if (!feedback) return [];
-    
-    const scores = Object.entries(feedback.scores);
-    const sortedScores = scores.sort(([,a], [,b]) => a - b); // Sort by score, lowest first
-    const [weakest, secondWeakest] = sortedScores;
-    const [strongest] = scores.sort(([,a], [,b]) => b - a); // Highest score
-    
-    const avgScore = Math.round(scores.reduce((sum, [,score]) => sum + score, 0) / scores.length);
-    
-    const recommendations = [];
-    
-    // Overall CLB strategy
-    recommendations.push({
-      type: 'overall',
-      icon: '🎯',
-      title: `Your Current Overall CLB Level: ${avgScore}`,
-      message: `To improve your overall CLB level, focus on strengthening your weakest areas first.`
-    });
-    
-    // Focus on weakest areas
-    if (weakest[1] < avgScore - 1) {
-      recommendations.push({
-        type: 'priority',
-        icon: '🚨',
-        title: `PRIORITY FOCUS: ${weakest[0].charAt(0).toUpperCase() + weakest[0].slice(1)} (CLB ${weakest[1]})`,
-        message: `This is significantly below your average. Improving this by just 1 CLB level will boost your overall score. ${getImprovementStrategy(weakest[0], weakest[1])}`
-      });
-    }
-    
-    if (secondWeakest[1] < avgScore) {
-      recommendations.push({
-        type: 'secondary',
-        icon: '⚡',
-        title: `SECONDARY FOCUS: ${secondWeakest[0].charAt(0).toUpperCase() + secondWeakest[0].slice(1)} (CLB ${secondWeakest[1]})`,
-        message: `Work on this after addressing your priority area. ${getImprovementStrategy(secondWeakest[0], secondWeakest[1])}`
-      });
-    }
-    
-    // Support stronger areas
-    if (strongest[1] >= avgScore) {
-      recommendations.push({
-        type: 'maintain',
-        icon: '🏆',
-        title: `MAINTAIN STRENGTH: ${strongest[0].charAt(0).toUpperCase() + strongest[0].slice(1)} (CLB ${strongest[1]})`,
-        message: `This is your strongest area. ${getMaintenanceStrategy(strongest[0], strongest[1])}`
-      });
-    }
-    
-    return recommendations;
-  };
 
   const getImprovementStrategy = (criterion: string, score: number) => {
     const strategies: Record<string, Record<number, string>> = {
