@@ -25,14 +25,7 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               } 
             />
-            <Route 
-              path="/practice" 
-              element={
-                <ProtectedRoute>
-                  <PracticeApp />
-                </ProtectedRoute>
-              } 
-            />
+                 <Route path="/practice" element={<PracticeApp />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

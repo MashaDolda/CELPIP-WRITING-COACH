@@ -1,144 +1,185 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TaskSelection from './TaskSelection';
 import EssayEditor from './EssayEditor';
 import FeedbackDisplay from './FeedbackDisplay';
+import Header from './Header';
 import { useAuth } from '../contexts/AuthContext';
+import { canSubmitEssay, updateGuestUsage, updateUserUsage } from '../services/usageService';
 import { saveEssayResult } from '../services/essayService';
-import { TaskType, EssayData, FeedbackData, CLBFeedbackData } from '../types';
-import { ArrowLeft } from 'lucide-react';
+import { TaskType, EssayData, FeedbackData } from '../types';
 
 type AppStep = 'selection' | 'writing' | 'feedback';
 
 const PracticeApp: React.FC = () => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<AppStep>('selection');
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
   const [essayData, setEssayData] = useState<EssayData | null>(null);
   const [feedback, setFeedback] = useState<FeedbackData | null>(null);
   const [loading, setLoading] = useState(false);
-  const { currentUser } = useAuth();
-  const navigate = useNavigate();
+  const [usageInfo, setUsageInfo] = useState(canSubmitEssay(currentUser?.uid));
 
-  const generateAIFeedback = async (essay: EssayData): Promise<FeedbackData> => {
-    const response = await fetch(`/api/evaluate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ essay }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get AI feedback');
-    }
-    
-    const clbData = await response.json();
-    
-    // Check if we have the new CLB format or old format
-    if (clbData.criteriaAnalysis) {
-      // Convert new CLB format to old format for compatibility
-      const convertedFeedback: FeedbackData = {
-        scores: {
-          content: clbData.criteriaAnalysis?.content?.celpipScore || 0,
-          vocabulary: clbData.criteriaAnalysis?.vocabulary?.celpipScore || 0,
-          readability: clbData.criteriaAnalysis?.readability?.celpipScore || 0,
-          taskFulfillment: clbData.criteriaAnalysis?.taskFulfillment?.celpipScore || 0
-        },
-        overallScore: clbData.overallCLB || 0,
-        recommendations: [
-          `📝 Content (CLB ${clbData.criteriaAnalysis?.content?.clbLevel}): ${clbData.criteriaAnalysis?.content?.improvementToNextLevel}`,
-          `📚 Vocabulary (CLB ${clbData.criteriaAnalysis?.vocabulary?.clbLevel}): ${clbData.criteriaAnalysis?.vocabulary?.improvementToNextLevel}`,
-          `✍️ Readability (CLB ${clbData.criteriaAnalysis?.readability?.clbLevel}): ${clbData.criteriaAnalysis?.readability?.improvementToNextLevel}`,
-          `🎯 Task Fulfillment (CLB ${clbData.criteriaAnalysis?.taskFulfillment?.clbLevel}): ${clbData.criteriaAnalysis?.taskFulfillment?.improvementToNextLevel}`
-        ],
-        corrections: clbData.keyCorrections || []
-      };
-      
-      return convertedFeedback;
-    } else {
-      // Old format - return as is
-      return clbData;
-    }
-  };
+  useEffect(() => {
+    // Update usage info when user changes
+    setUsageInfo(canSubmitEssay(currentUser?.uid));
+  }, [currentUser]);
 
   const handleTaskSelect = (task: TaskType) => {
+    // Check if user can still submit essays
+    const currentUsage = canSubmitEssay(currentUser?.uid);
+    if (!currentUsage.canSubmit) {
+      alert(`You've reached your monthly limit. ${currentUsage.isGuest ? 'Sign up for more essays!' : 'Upgrade for unlimited access.'}`);
+      return;
+    }
+    
     setSelectedTask(task);
     setCurrentStep('writing');
   };
 
   const handleEssaySubmit = async (essay: EssayData) => {
-    setEssayData(essay);
     setLoading(true);
-    setCurrentStep('feedback');
+    setEssayData(essay);
     
     try {
       const feedbackData = await generateAIFeedback(essay);
       setFeedback(feedbackData);
       
-      // Save to Firebase if user is authenticated
-      if (currentUser) {
+      // Save essay result if user is logged in
+      if (currentUser?.uid) {
         await saveEssayResult(currentUser.uid, essay, feedbackData);
       }
+      
+      setCurrentStep('feedback');
     } catch (error) {
-      console.error('Error getting feedback:', error);
-      // Handle error appropriately
+      console.error('Error processing essay:', error);
+      alert('There was an error processing your essay. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleBackToTasks = () => {
-    setCurrentStep('selection');
-    setSelectedTask(null);
-    setEssayData(null);
-    setFeedback(null);
+  const generateAIFeedback = async (essayData: EssayData): Promise<FeedbackData> => {
+    try {
+      const response = await fetch('/.netlify/functions/evaluate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          task: essayData.task,
+          essay: essayData.content,
+          wordCount: essayData.wordCount,
+          timeSpent: essayData.timeSpent,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      // Update usage after successful evaluation
+      if (currentUser?.uid) {
+        updateUserUsage(currentUser.uid);
+      } else {
+        updateGuestUsage();
+      }
+      
+      // Update local usage info
+      setUsageInfo(canSubmitEssay(currentUser?.uid));
+      
+      // Convert new CLB format to old format for display compatibility
+      const feedbackData: FeedbackData = {
+        scores: {
+          content: result.criteriaAnalysis?.content?.clbLevel || result.overallCLB || 7,
+          vocabulary: result.criteriaAnalysis?.vocabulary?.clbLevel || result.overallCLB || 7,
+          readability: result.criteriaAnalysis?.readability?.clbLevel || result.overallCLB || 7,
+          taskFulfillment: result.criteriaAnalysis?.taskFulfillment?.clbLevel || result.overallCLB || 7,
+        },
+        overallScore: result.overallCLB || 7,
+        recommendations: [
+          result.criteriaAnalysis?.content?.improvementToNextLevel || 'Focus on developing your ideas more clearly.',
+          result.criteriaAnalysis?.vocabulary?.improvementToNextLevel || 'Expand your vocabulary usage.',
+          result.criteriaAnalysis?.readability?.improvementToNextLevel || 'Improve sentence structure and grammar.',
+          result.criteriaAnalysis?.taskFulfillment?.improvementToNextLevel || 'Better address all task requirements.',
+        ],
+        corrections: result.keyCorrections || []
+      };
+      
+      return feedbackData;
+      
+    } catch (error) {
+      console.error('Error generating feedback:', error);
+      // Return fallback data
+      return {
+        scores: { content: 6, vocabulary: 6, readability: 6, taskFulfillment: 6 },
+        overallScore: 6,
+        recommendations: [
+          'Continue practicing to improve your writing skills.',
+          'Focus on using varied vocabulary and sentence structures.',
+          'Ensure all parts of the task are addressed completely.',
+        ],
+        corrections: []
+      };
+    }
   };
 
-  const handleBackToDashboard = () => {
-    navigate('/dashboard');
+  const handleBack = () => {
+    if (currentStep === 'feedback') {
+      setCurrentStep('selection');
+      setSelectedTask(null);
+      setEssayData(null);
+      setFeedback(null);
+    } else if (currentStep === 'writing') {
+      setCurrentStep('selection');
+      setSelectedTask(null);
+    }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <button
-                onClick={handleBackToDashboard}
-                className="flex items-center text-gray-600 hover:text-gray-800 transition-colors mr-4"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </button>
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg mr-3"></div>
-              <h1 className="text-xl font-bold text-gray-900">CELPIP Writing Practice</h1>
-            </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Analyzing your essay...</p>
           </div>
         </div>
       </div>
-      
-      <main className="container mx-auto px-4 py-8">
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="container mx-auto px-4 py-8">
         {currentStep === 'selection' && (
-          <TaskSelection onTaskSelect={handleTaskSelect} />
+          <TaskSelection 
+            onTaskSelect={handleTaskSelect} 
+            usageInfo={usageInfo}
+          />
         )}
         
         {currentStep === 'writing' && selectedTask && (
-          <EssayEditor
+          <EssayEditor 
             task={selectedTask}
             onSubmit={handleEssaySubmit}
-            onBack={handleBackToTasks}
+            onBack={handleBack}
           />
         )}
         
-        {currentStep === 'feedback' && essayData && (
-          <FeedbackDisplay
+        {currentStep === 'feedback' && essayData && feedback && (
+          <FeedbackDisplay 
             essay={essayData}
-            feedback={loading ? null : feedback}
-            onBack={handleBackToTasks}
+            feedback={feedback}
+            onBack={handleBack}
           />
         )}
-      </main>
+      </div>
     </div>
   );
 };

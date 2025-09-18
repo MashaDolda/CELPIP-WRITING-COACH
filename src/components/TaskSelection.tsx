@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Mail, FileText, Upload, ChevronLeft, ChevronRight, Star, Users, Trophy } from 'lucide-react';
 import { TaskType } from '../types';
-import { EMAIL_TASKS, SURVEY_TASKS, getFreeTasksOnly, getPremiumTasks } from '../data/taskLibrary';
+import { EMAIL_TASKS, SURVEY_TASKS } from '../data/taskLibrary';
 import CustomTaskUpload from './CustomTaskUpload';
+import UsageIndicator from './UsageIndicator';
 
 interface TaskSelectionProps {
   onTaskSelect: (task: TaskType) => void;
+  usageInfo: {
+    canSubmit: boolean;
+    remaining: number;
+    limit: number;
+    isGuest: boolean;
+  };
 }
 
 const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {

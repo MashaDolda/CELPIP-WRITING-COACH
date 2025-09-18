@@ -94,13 +94,22 @@ const LandingPage: React.FC = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Link
-                to="/signup"
-                className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-8 py-4 rounded-lg text-lg font-medium hover:from-blue-700 hover:to-green-700 transition-all flex items-center justify-center"
-              >
-                Start Free Practice
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
+              <div className="space-x-4 flex">
+                <Link
+                  to="/practice"
+                  className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-8 py-4 rounded-lg text-lg font-medium hover:from-blue-700 hover:to-green-700 transition-all flex items-center justify-center"
+                >
+                  Try Practice Now
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Link>
+                <Link
+                  to="/signup"
+                  className="border-2 border-blue-600 text-blue-600 bg-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-blue-50 transition-colors flex items-center justify-center"
+                >
+                  Sign Up Free
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Link>
+              </div>
               <Link
                 to="/login"
                 className="border border-gray-300 text-gray-700 px-8 py-4 rounded-lg text-lg font-medium hover:bg-gray-50 transition-colors"
@@ -278,13 +287,22 @@ const LandingPage: React.FC = () => {
           <p className="text-xl text-blue-100 mb-8">
             Join thousands of students who've improved their CELPIP writing scores with our AI-powered coaching
           </p>
-          <Link
-            to="/signup"
-            className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-medium hover:bg-gray-100 transition-colors inline-flex items-center"
-          >
-            Start Your Free Practice
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Link>
+          <div className="space-x-4">
+            <Link
+              to="/practice"
+              className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-medium hover:bg-gray-100 transition-colors inline-flex items-center"
+            >
+              Try Free Practice
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Link>
+            <Link
+              to="/signup"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-white hover:text-blue-600 transition-colors inline-flex items-center"
+            >
+              Sign Up for More
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Link>
+          </div>
         </div>
       </section>
 

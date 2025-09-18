@@ -1,41 +1,101 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Globe } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { LogOut, Home, User, PenTool } from 'lucide-react';
 
 const Header: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="bg-primary-600 text-white p-2 rounded-lg">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-              <p className="text-sm text-gray-600">{t('subtitle')}</p>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div 
+            className="flex items-center cursor-pointer" 
+            onClick={() => navigate('/')}
+          >
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg mr-3"></div>
+            <span className="text-xl font-bold text-gray-900">CELPIP Writing Coach</span>
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <Globe className="w-4 h-4 text-gray-500" />
-            <select
-              value={i18n.language}
-              onChange={(e) => changeLanguage(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+
+          {/* Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
             >
-              <option value="en">English</option>
-              <option value="ru">Русский</option>
-              <option value="uk">Українська</option>
-            </select>
+              <Home className="w-4 h-4 mr-2" />
+              Home
+            </button>
+            
+            <button
+              onClick={() => navigate('/practice')}
+              className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              <PenTool className="w-4 h-4 mr-2" />
+              Practice
+            </button>
+
+            {currentUser ? (
+              <>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Dashboard
+                </button>
+                
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-600 text-sm">
+                    Hi, {currentUser.displayName || 'User'}!
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center text-gray-700 hover:text-red-600 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => navigate('/login')}
+                  className="text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
+          </nav>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => navigate(currentUser ? '/dashboard' : '/signup')}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+            >
+              {currentUser ? 'Dashboard' : 'Sign Up'}
+            </button>
           </div>
         </div>
       </div>
