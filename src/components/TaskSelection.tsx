@@ -15,8 +15,7 @@ interface TaskSelectionProps {
   };
 }
 
-const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
-  const { i18n } = useTranslation();
+const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect, usageInfo }) => {
   const [showCustomUpload, setShowCustomUpload] = useState(false);
   const [activeTab, setActiveTab] = useState<'email' | 'survey' | 'custom'>('email');
   const [emailPage, setEmailPage] = useState(0);
@@ -57,9 +56,14 @@ const TaskSelection: React.FC<TaskSelectionProps> = ({ onTaskSelect }) => {
       {/* Header */}
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Choose Your CELPIP Writing Task</h2>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-gray-600 mb-6">
           Select from authentic CELPIP tasks - organized and easy to navigate
         </p>
+        <UsageIndicator 
+          remaining={usageInfo.remaining} 
+          limit={usageInfo.limit} 
+          isGuest={usageInfo.isGuest} 
+        />
       </div>
 
       {/* Navigation Tabs */}
