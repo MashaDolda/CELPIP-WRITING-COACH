@@ -1,10 +1,4 @@
 // Usage tracking for free users and guests
-interface UsageData {
-  userId: string;
-  month: string; // Format: "2024-12"
-  essaysSubmitted: number;
-  lastUsed: Date;
-}
 
 const GUEST_LIMIT = 3; // 3 free essays for guests
 const FREE_USER_LIMIT = 10; // 10 essays per month for registered free users

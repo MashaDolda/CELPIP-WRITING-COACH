@@ -40,7 +40,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(false); // Set to false for demo mode
+  const [loading] = useState(false); // Set to false for demo mode
 
   const createDemoProfile = (email: string, name: string): UserProfile => {
     return {

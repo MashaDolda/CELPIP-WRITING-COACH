@@ -4,7 +4,6 @@ import {
   PenTool, 
   Target, 
   TrendingUp, 
-  Star, 
   ArrowRight,
   BookOpen
 } from 'lucide-react';
